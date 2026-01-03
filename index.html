@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sorting Algorithms Visualizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Sorting Algorithms Visualizer</h1>
+
+<!-- ARRAY INPUT LINE -->
+<div class="controls top-controls">
+    <button onclick="generateArray()">Generate Random</button>
+    <input id="customArray" placeholder="Enter array e.g. 22,41,6,71,11,46">
+    <button onclick="useCustomArray()">Use Array</button>
+</div>
+
+<!-- SORT BUTTONS -->
+<div class="controls">
+    <button onclick="bubbleSort()">Bubble</button>
+    <button onclick="selectionSort()">Selection</button>
+    <button onclick="insertionSort()">Insertion</button>
+    <button onclick="mergeSortStart()">Merge</button>
+    <button onclick="quickSortStart()">Quick</button>
+</div>
+
+<div id="array" class="array-container"></div>
+
+<!-- Confetti -->
+<div id="confetti-container"></div>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background: linear-gradient(
+        135deg,
+        #e8f6ff,   
+        #eefedc    
+    );
+    text-align:center;
+    padding:20px;
+}
+
+
+h1{ margin-bottom:15px; }
+
+.controls{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:12px;
+}
+
+.top-controls{ margin-bottom:18px; }
+
+input{
+    padding:8px;
+    border-radius:6px;
+    border:1px solid #bbb;
+    width:260px;
+}
+
+button{
+    padding:10px 14px;
+    border:none;
+    background:#4f46e5;
+    color:white;
+    font-weight:bold;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+button:hover{ background:#4338ca; }
+
+.array-container{
+    display:flex;
+    justify-content:center;
+    align-items:flex-end;
+    height:400px;
+    gap:6px;
+    margin-top:30px;
+}
+
+/* Bars */
+.bar{
+    width:35px;
+    background:#60a5fa;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    color:white;
+    font-weight:bold;
+    transition:height 0.3s, background 0.3s;
+}
+
+.bar span{ padding-bottom:5px; }
+
+.bar.active{ background:#f97316; }
+.bar.sorted{ background:#22c55e; }
+
+/* Confetti */
+#confetti-container{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:999;
+}
+
+.confetti{
+    position:absolute;
+    opacity:0.9;
+    animation:explode 3.5s ease-out forwards;
+}
+
+@keyframes explode{
+    0%{
+        transform: translate(0,0) rotate(0deg);
+        opacity:1;
+    }
+    100%{
+        transform: translate(var(--x), var(--y)) rotate(720deg);
+        opacity:0;
+    }
+}
