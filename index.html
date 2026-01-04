@@ -9,7 +9,10 @@
 
 <h1>Sorting Algorithms Visualizer</h1>
 
-<!-- ARRAY INPUT LINE -->
+<!-- MESSAGE -->
+<div id="message" class="message"></div>
+
+<!-- ARRAY INPUT -->
 <div class="controls top-controls">
     <button onclick="generateArray()">Generate Random</button>
     <input id="customArray" placeholder="Enter array e.g. 22,41,6,71,11,46">
@@ -18,16 +21,16 @@
 
 <!-- SORT BUTTONS -->
 <div class="controls">
-    <button onclick="bubbleSort()">Bubble</button>
-    <button onclick="selectionSort()">Selection</button>
-    <button onclick="insertionSort()">Insertion</button>
-    <button onclick="mergeSortStart()">Merge</button>
-    <button onclick="quickSortStart()">Quick</button>
+    <button onclick="bubbleSort()">Bubble Sort</button>
+    <button onclick="selectionSort()">Selection Sort</button>
+    <button onclick="insertionSort()">Insertion Sort</button>
+    <button onclick="mergeSortStart()">Merge Sort</button>
+    <button onclick="quickSortStart()">Quick Sort</button>
 </div>
 
 <div id="array" class="array-container"></div>
 
-<!-- Confetti -->
+<!-- CONFETTI -->
 <div id="confetti-container"></div>
 
 <script src="script.js"></script>

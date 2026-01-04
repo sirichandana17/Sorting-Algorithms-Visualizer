@@ -1,255 +1,266 @@
 let array = [];
 const size = 15;
-const delay = 250; // ORIGINAL SPEED
-const container = document.getElementById("array");
+const delay = 250;
+let isSorting = false;
 
-/* ---------- Utility ---------- */
-function sleep(ms){
-    return new Promise(res => setTimeout(res, ms));
+const container = document.getElementById("array");
+const messageBox = document.getElementById("message");
+
+/* ---------- UTIL ---------- */
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+function showMessage(msg, color="#dc2626"){
+    messageBox.style.color = color;
+    messageBox.innerText = msg;
 }
 
-/* ---------- Render Array ---------- */
+function clearMessage(){ messageBox.innerText = ""; }
+
+function isSorted(){
+    for(let i=1;i<array.length;i++){
+        if(array[i] < array[i-1]) return false;
+    }
+    return true;
+}
+
+/* ---------- RENDER ---------- */
 function renderArray(){
-    container.innerHTML = "";
-    array.forEach(val => {
-        let bar = document.createElement("div");
-        bar.className = "bar";
-        bar.style.height = val * 3 + "px";
-
-        let label = document.createElement("span");
-        label.innerText = val;
-
-        bar.appendChild(label);
+    container.innerHTML="";
+    array.forEach(v=>{
+        const bar=document.createElement("div");
+        bar.className="bar";
+        bar.style.height=v*3+"px";
+        bar.innerHTML=`<span>${v}</span>`;
         container.appendChild(bar);
     });
 }
 
-/* ---------- Generate Random ---------- */
+/* ---------- INPUT ---------- */
 function generateArray(){
-    array = [];
-    for(let i=0;i<size;i++){
-        array.push(Math.floor(Math.random()*90)+10);
-    }
+    if(isSorting) return showMessage("Sorting in progress...");
+    clearMessage();
+    array=[];
+    for(let i=0;i<size;i++) array.push(Math.floor(Math.random()*90)+10);
     renderArray();
 }
 
-/* ---------- Custom Array ---------- */
 function useCustomArray(){
-    let input = document.getElementById("customArray").value;
-    if(!input) return alert("Enter numbers");
-
-    array = input.split(",")
-        .map(n => parseInt(n.trim()))
-        .filter(n => !isNaN(n));
-
-    if(array.length === 0) return alert("Invalid array");
+    if(isSorting) return showMessage("Sorting in progress...");
+    const input=document.getElementById("customArray").value;
+    if(!input) return showMessage("Enter an array");
+    array=input.split(",").map(n=>parseInt(n.trim())).filter(n=>!isNaN(n));
+    if(!array.length) return showMessage("Invalid array");
+    clearMessage();
     renderArray();
 }
 
-/* ---------- Update Bars ---------- */
-function updateBars(bars,i,j){
-    bars[i].style.height = array[i]*3+"px";
-    bars[j].style.height = array[j]*3+"px";
-    bars[i].children[0].innerText = array[i];
-    bars[j].children[0].innerText = array[j];
-}
-
-/* ---------- CONFETTI EXPLOSION FROM BARS ---------- */
+/* ---------- CONFETTI FROM BARS ---------- */
 function launchConfetti(){
-    const container = document.getElementById("confetti-container");
-    container.innerHTML = "";
+    const c=document.getElementById("confetti-container");
+    c.innerHTML="";
+    const bars=document.querySelectorAll(".bar");
+    const colors=["#ff4d4d","#4dff4d","#4d4dff","#ffd24d","#ff66ff","#22c55e"];
 
-    const bars = document.querySelectorAll(".bar");
-    const colors = ["#ff4d4d","#4dff4d","#4d4dff","#ffd24d","#ff66ff","#22c55e"];
-
-    bars.forEach(bar => {
-        const rect = bar.getBoundingClientRect();
-
+    bars.forEach(bar=>{
+        const r=bar.getBoundingClientRect();
         for(let i=0;i<8;i++){
-            const c = document.createElement("div");
-            c.className = "confetti";
-
-            c.style.left = rect.left + rect.width/2 + "px";
-            c.style.top = rect.top + "px";
-
-            const size = Math.random()*6 + 6;
-            c.style.width = size + "px";
-            c.style.height = size + "px";
-
-            c.style.backgroundColor =
-                colors[Math.floor(Math.random()*colors.length)];
-
-            c.style.setProperty("--x",
-                (Math.random()*400 - 200) + "px");
-            c.style.setProperty("--y",
-                -(Math.random()*300 + 150) + "px");
-
-            container.appendChild(c);
+            const f=document.createElement("div");
+            f.className="confetti";
+            f.style.left=r.left+r.width/2+"px";
+            f.style.top=r.top+"px";
+            f.style.width=f.style.height=(Math.random()*6+6)+"px";
+            f.style.backgroundColor=colors[Math.floor(Math.random()*colors.length)];
+            f.style.setProperty("--x",(Math.random()*400-200)+"px");
+            f.style.setProperty("--y",-(Math.random()*300+150)+"px");
+            c.appendChild(f);
         }
     });
-
-    setTimeout(() => container.innerHTML="", 4000);
+    setTimeout(()=>c.innerHTML="",4000);
 }
 
-/* ---------- Bubble Sort ---------- */
+/* ---------- GUARD ---------- */
+function canSort(){
+    if(isSorting) return showMessage("Sorting in progress...");
+    if(isSorted()) return showMessage("Array already sorted","#16a34a");
+    clearMessage();
+    return true;
+}
+
+/* ---------- UPDATE ---------- */
+function updateBars(b,i,j){
+    b[i].style.height=array[i]*3+"px";
+    b[j].style.height=array[j]*3+"px";
+    b[i].children[0].innerText=array[i];
+    b[j].children[0].innerText=array[j];
+}
+
+/* ---------- BUBBLE ---------- */
 async function bubbleSort(){
-    let bars = document.querySelectorAll(".bar");
+    if(!canSort()) return;
+    isSorting=true;
+    const b=document.querySelectorAll(".bar");
+
     for(let i=0;i<array.length;i++){
         for(let j=0;j<array.length-i-1;j++){
-            bars[j].classList.add("active");
-            bars[j+1].classList.add("active");
+            b[j].classList.add("active");
+            b[j+1].classList.add("active");
 
-            if(array[j] > array[j+1]){
+            if(array[j]>array[j+1]){
                 [array[j],array[j+1]]=[array[j+1],array[j]];
-                updateBars(bars,j,j+1);
+                updateBars(b,j,j+1);
             }
-
             await sleep(delay);
-            bars[j].classList.remove("active");
-            bars[j+1].classList.remove("active");
+            b[j].classList.remove("active");
+            b[j+1].classList.remove("active");
         }
-        bars[array.length-i-1].classList.add("sorted");
+        b[array.length-i-1].classList.add("sorted");
     }
+    isSorting=false;
     launchConfetti();
 }
 
-/* ---------- Selection Sort ---------- */
+/* ---------- SELECTION ---------- */
 async function selectionSort(){
-    let bars=document.querySelectorAll(".bar");
+    if(!canSort()) return;
+    isSorting=true;
+    const b=document.querySelectorAll(".bar");
+
     for(let i=0;i<array.length;i++){
         let min=i;
-        bars[min].classList.add("active");
+        b[min].classList.add("active");
 
         for(let j=i+1;j<array.length;j++){
-            bars[j].classList.add("active");
+            b[j].classList.add("active");
             await sleep(delay);
             if(array[j]<array[min]){
-                bars[min].classList.remove("active");
+                b[min].classList.remove("active");
                 min=j;
-                bars[min].classList.add("active");
+                b[min].classList.add("active");
             }
-            bars[j].classList.remove("active");
+            b[j].classList.remove("active");
         }
 
         [array[i],array[min]]=[array[min],array[i]];
-        updateBars(bars,i,min);
-        bars[min].classList.remove("active");
-        bars[i].classList.add("sorted");
+        updateBars(b,i,min);
+        b[min].classList.remove("active");
+        b[i].classList.add("sorted");
     }
+    isSorting=false;
     launchConfetti();
 }
 
-/* ---------- Insertion Sort ---------- */
+/* ---------- INSERTION ---------- */
 async function insertionSort(){
-    let bars=document.querySelectorAll(".bar");
-    for(let i=1;i<array.length;i++){
-        let key=array[i];
-        let j=i-1;
-        bars[i].classList.add("active");
+    if(!canSort()) return;
+    isSorting=true;
+    const b=document.querySelectorAll(".bar");
 
+    for(let i=1;i<array.length;i++){
+        let key=array[i], j=i-1;
         while(j>=0 && array[j]>key){
             array[j+1]=array[j];
-            updateBars(bars,j+1,j);
+            updateBars(b,j+1,j);
             j--;
             await sleep(delay);
         }
-
         array[j+1]=key;
-        bars[j+1].style.height=key*3+"px";
-        bars[j+1].children[0].innerText=key;
-        bars.forEach(b=>b.classList.remove("active"));
+        b[j+1].style.height=key*3+"px";
+        b[j+1].children[0].innerText=key;
     }
-    bars.forEach(b=>b.classList.add("sorted"));
+    b.forEach(x=>x.classList.add("sorted"));
+    isSorting=false;
     launchConfetti();
 }
 
-/* ---------- Merge Sort ---------- */
+/* ---------- MERGE ---------- */
 async function mergeSortStart(){
+    if(!canSort()) return;
+    isSorting=true;
     await mergeSort(0,array.length-1);
     document.querySelectorAll(".bar").forEach(b=>b.classList.add("sorted"));
+    isSorting=false;
     launchConfetti();
 }
 
 async function mergeSort(l,r){
     if(l>=r) return;
-    let m=Math.floor((l+r)/2);
+    const m=Math.floor((l+r)/2);
     await mergeSort(l,m);
     await mergeSort(m+1,r);
     await merge(l,m,r);
 }
 
 async function merge(l,m,r){
-    let bars=document.querySelectorAll(".bar");
-    let left=array.slice(l,m+1);
-    let right=array.slice(m+1,r+1);
+    const b=document.querySelectorAll(".bar");
+    const L=array.slice(l,m+1), R=array.slice(m+1,r+1);
     let i=0,j=0,k=l;
 
-    while(i<left.length && j<right.length){
-        bars[k].classList.add("active");
-        array[k]=left[i]<=right[j]?left[i++]:right[j++];
-        bars[k].style.height=array[k]*3+"px";
-        bars[k].children[0].innerText=array[k];
+    while(i<L.length && j<R.length){
+        b[k].classList.add("active");
+        array[k]=L[i]<=R[j]?L[i++]:R[j++];
+        b[k].style.height=array[k]*3+"px";
+        b[k].children[0].innerText=array[k];
         await sleep(delay);
-        bars[k].classList.remove("active");
+        b[k].classList.remove("active");
         k++;
     }
-
-    while(i<left.length){
-        bars[k].classList.add("active");
-        array[k]=left[i++];
-        bars[k].style.height=array[k]*3+"px";
-        bars[k].children[0].innerText=array[k];
+    while(i<L.length){
+        b[k].classList.add("active");
+        array[k]=L[i++];
+        b[k].style.height=array[k]*3+"px";
+        b[k].children[0].innerText=array[k];
         await sleep(delay);
-        bars[k].classList.remove("active");
+        b[k].classList.remove("active");
         k++;
     }
-
-    while(j<right.length){
-        bars[k].classList.add("active");
-        array[k]=right[j++];
-        bars[k].style.height=array[k]*3+"px";
-        bars[k].children[0].innerText=array[k];
+    while(j<R.length){
+        b[k].classList.add("active");
+        array[k]=R[j++];
+        b[k].style.height=array[k]*3+"px";
+        b[k].children[0].innerText=array[k];
         await sleep(delay);
-        bars[k].classList.remove("active");
+        b[k].classList.remove("active");
         k++;
     }
 }
 
-/* ---------- Quick Sort ---------- */
+/* ---------- QUICK ---------- */
 async function quickSortStart(){
+    if(!canSort()) return;
+    isSorting=true;
     await quickSort(0,array.length-1);
     document.querySelectorAll(".bar").forEach(b=>b.classList.add("sorted"));
+    isSorting=false;
     launchConfetti();
 }
 
 async function quickSort(l,r){
     if(l<r){
-        let p=await partition(l,r);
+        const p=await partition(l,r);
         await quickSort(l,p-1);
         await quickSort(p+1,r);
     }
 }
 
 async function partition(l,r){
-    let bars=document.querySelectorAll(".bar");
-    let pivot=array[r];
+    const b=document.querySelectorAll(".bar");
+    const pivot=array[r];
     let i=l-1;
 
     for(let j=l;j<r;j++){
-        bars[j].classList.add("active");
+        b[j].classList.add("active");
         await sleep(delay);
         if(array[j]<pivot){
             i++;
             [array[i],array[j]]=[array[j],array[i]];
-            updateBars(bars,i,j);
+            updateBars(b,i,j);
         }
-        bars[j].classList.remove("active");
+        b[j].classList.remove("active");
     }
-
     [array[i+1],array[r]]=[array[r],array[i+1]];
-    updateBars(bars,i+1,r);
+    updateBars(b,i+1,r);
     return i+1;
 }
 
-/* ---------- Init ---------- */
+/* ---------- INIT ---------- */
 generateArray();
